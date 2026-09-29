@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IBEX Software — App Store</title>
+  <link rel="icon" href="assets/logo-mark.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast hidden"></div>
+
+  <header class="topbar">
+    <div class="brand" onclick="go('home')">
+      <img src="assets/logo-mark.png" alt="IBEX" />
+      <div>
+        <strong>IBEX</strong>
+        <span>Software</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="link" data-view="home" onclick="go('home')" data-i18n="nav_home">الرئيسية</button>
+      <button class="link" data-view="apps" onclick="go('apps')" data-i18n="nav_apps">التطبيقات</button>
+      <button class="link admin-only hidden" data-view="admin" onclick="go('admin')" data-i18n="nav_admin">لوحة الإدارة</button>
+    </nav>
+    <div class="actions">
+      <button class="chip" id="langBtn" onclick="toggleLang()">EN</button>
+      <button class="btn ghost hidden" id="logoutBtn" onclick="logout()" data-i18n="logout">خروج</button>
+      <button class="btn" id="loginBtn" onclick="go('auth')" data-i18n="login">دخول</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="view-home" class="view">
+      <div class="hero">
+        <div>
+          <p class="eyebrow" data-i18n="hero_eyebrow">متجر تطبيقات الشركة</p>
+          <h1 data-i18n="hero_title">حمّل تطبيقات IBEX الرسمية بأمان</h1>
+          <p class="lead" data-i18n="hero_lead">سجل دخولك، تصفح التطبيقات، حمّل ملف APK، وقيّم تجربتك.</p>
+          <div class="hero-cta">
+            <button class="btn" onclick="go('apps')" data-i18n="browse">تصفح التطبيقات</button>
+            <button class="btn ghost" onclick="go('auth')" data-i18n="create_account">إنشاء حساب</button>
+          </div>
+        </div>
+        <div class="hero-card">
+          <img src="assets/logo-full.jpg" alt="IBEX Software" />
+          <div class="stats-mini" id="homeStats">
+            <div><b id="statApps">0</b><span data-i18n="apps">تطبيق</span></div>
+            <div><b id="statDownloads">0</b><span data-i18n="downloads">تحميل</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-auth" class="view hidden">
+      <div class="auth-wrap">
+        <h2 id="authTitle" data-i18n="login">تسجيل الدخول</h2>
+        <form id="authForm" onsubmit="handleAuth(event)">
+          <label data-i18n="email">البريد الإلكتروني</label>
+          <input type="email" id="email" required />
+          <label data-i18n="password">كلمة المرور</label>
+          <input type="password" id="password" minlength="6" required />
+          <button class="btn full" type="submit" id="authSubmit" data-i18n="login">دخول</button>
+        </form>
+        <button class="link-btn" id="toggleAuthMode" onclick="toggleAuthMode()" data-i18n="need_account">ليس لديك حساب؟ إنشاء حساب</button>
+      </div>
+    </section>
+
+    <section id="view-apps" class="view hidden">
+      <div class="section-head">
+        <h2 data-i18n="apps_title">تطبيقات IBEX</h2>
+        <input id="search" type="search" placeholder="بحث..." oninput="renderApps()" />
+      </div>
+      <div id="appsGrid" class="grid"></div>
+    </section>
+
+    <section id="view-app" class="view hidden">
+      <button class="link-btn" onclick="go('apps')" data-i18n="back">← رجوع</button>
+      <div id="appDetail" class="detail"></div>
+    </section>
+
+    <section id="view-admin" class="view hidden">
+      <div class="section-head">
+        <h2 data-i18n="admin_title">لوحة الإدارة</h2>
+      </div>
+      <div class="admin-grid">
+        <div class="card">
+          <h3 data-i18n="upload_app">رفع تطبيق جديد</h3>
+          <form id="uploadForm" onsubmit="uploadApp(event)">
+            <label data-i18n="app_name_ar">اسم التطبيق (عربي)</label>
+            <input id="nameAr" required />
+            <label data-i18n="app_name_en">App name (English)</label>
+            <input id="nameEn" required />
+            <label data-i18n="desc_ar">الوصف بالعربي</label>
+            <textarea id="descAr" rows="3" required></textarea>
+            <label data-i18n="desc_en">Description in English</label>
+            <textarea id="descEn" rows="3" required></textarea>
+            <label data-i18n="version">الإصدار</label>
+            <input id="version" value="1.0.0" required />
+            <label data-i18n="category">التصنيف</label>
+            <input id="category" placeholder="Productivity / إنتاجية" />
+            <label data-i18n="icon">أيقونة التطبيق</label>
+            <input type="file" id="iconFile" accept="image/*" />
+            <label data-i18n="apk">ملف APK</label>
+            <input type="file" id="apkFile" accept=".apk,application/vnd.android.package-archive" required />
+            <button class="btn full" type="submit" data-i18n="publish">نشر التطبيق</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3 data-i18n="stats">الإحصائيات</h3>
+          <div id="adminStats" class="admin-stats"></div>
+          <h3 data-i18n="manage">إدارة التطبيقات</h3>
+          <div id="adminList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <img src="assets/logo-mark.png" alt="" />
+    <p>© 2026 IBEX Software</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
